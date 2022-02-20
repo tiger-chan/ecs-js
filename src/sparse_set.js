@@ -1,7 +1,8 @@
 import { PAGE_SIZE, NULL } from "./constants.js";
 import { FixedArray } from "./fixed_array.js";
 import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
-import { assert } from "./assert.js"
+import { assert } from "./assert.js";
+import { Vector } from "./stl.js";
 
 class Iterator {
 	constructor(dense) {
@@ -19,7 +20,7 @@ class Iterator {
 	next(reset) {
 		if (reset) {
 			this.#itCount = 0;
-			this.#nextIdx = this.dense.length - 1;
+			this.#nextIdx = this.#dense.length - 1;
 		}
 
 		if (0 <= this.#nextIdx) {
@@ -41,20 +42,6 @@ class Iterator {
 export class SparseSet {
 	constructor() {
 		this.#freeList = NULL;
-		let back = function () {
-			if (this.length > 0) {
-				return this[this.length - 1];
-			}
-			return null;
-		};
-
-		let resize = function (newSize, defaultValue) {
-			while (newSize > this.length)
-				this.push(defaultValue);
-			this.length = newSize;
-		}
-		this.#dense.back = back.bind(this.#dense);
-		this.#sparse.resize = resize.bind(this.#sparse);
 	}
 
 	contains(id) {
@@ -67,17 +54,13 @@ export class SparseSet {
 		return new Iterator(this.#dense);
 	}
 
-	/**
-	 * 
-	 * @param {number} expected_id preferred id to emplace if available
-	 * @returns {number} id of emplaced entry
-	 */
-	emplace(id) {
+	_emplace(id, mixin = { push() { }, update(pos) { } }) {
 		assert(() => !this.contains(id), `Already contains entry ${id}`);
 		let elem = this.#ensure_space(new SparseId(id));
 
 		if (this.#freeList == NULL) {
 			this.#dense.push(combine(elem.toNumber(), id));
+			mixin.push();
 			this.#sparse[elem.page()][elem.pos()] = combine(this.#dense.length - 1, id);
 			elem = id;
 		}
@@ -85,6 +68,7 @@ export class SparseSet {
 			const pos = toId(this.#freeList);
 			const dense = this.#dense[pos];
 			elem = this.#dense[pos] = id;
+			mixin.update(pos);
 			this.#freeList = dense;
 		}
 
@@ -92,12 +76,34 @@ export class SparseSet {
 	}
 
 	/**
+	 *
+	 * @param {number} id preferred id to emplace if available
+	 * @returns {number} id of emplaced entry
+	 */
+	emplace(id) {
+		return this._emplace(id);
+	}
+
+	_erase(id, mixin = { swap(posA, posB) { }, pop() { } }) {
+		const start = this.#index(id);
+		this.#swap_pop(start, start + 1, mixin);
+	}
+
+	/**
 	 * 
 	 * @param {number} id 
 	 */
 	erase(id) {
-		const start = this.#index(id);
-		this.#swap_pop(start, start + 1);
+		this._erase(id);
+	}
+
+	_get(id) {
+		let ptr = this.#sparse_ptr(id);
+		return this.#sparse[ptr.page()][ptr.pos()];
+	}
+
+	get _dense() {
+		return this.#dense;
 	}
 
 	#index = (x) => {
@@ -133,7 +139,13 @@ export class SparseSet {
 		return elem;
 	}
 
-	#swap_pop = (first, last) => {
+	/**
+	 *
+	 * @param {number} first
+	 * @param {number} last
+	 * @param {{swap: (posA, posB) => void, pop: () => void }} mixin
+	 */
+	#swap_pop = (first, last, mixin) => {
 		for (let it = first; it != last; ++it) {
 			let back = this.#sparse_ptr(this.#dense.back());
 			let popped = new SparseId(it);
@@ -141,8 +153,10 @@ export class SparseSet {
 			this.#sparse[back.page()][back.pos()] = combine(originalDense, back);
 			const id = new SparseId(this.#dense[originalDense]);
 			this.#dense[originalDense] = this.#dense.back();
+			mixin.swap(originalDense, this.#dense.length - 1);
 			this.#sparse[id.page()][id.pos()] = NULL;
 			this.#dense.pop();
+			mixin.pop();
 		}
 	}
 
@@ -161,9 +175,9 @@ export class SparseSet {
 	}
 
 	/** @type {Array<number>} */
-	#dense = new Array();
+	#dense = new Vector();
 	/** @type {Array<Array<number>>} */
-	#sparse = new Array();
+	#sparse = new Vector();
 	/** @type {number} */
 	#freeList = NULL;
 }
