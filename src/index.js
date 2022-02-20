@@ -11,8 +11,20 @@ for (let i = 4; i < 6; ++i) {
 	set.erase(i);
 }
 
+let each = [];
 for (let x of set.each()) {
-	console.log(x);
+	each.push(x);
 }
+console.log("each", each);
 
-console.log(set, ids);
+let a = set.each();
+let iter = [];
+let result = a.next();
+while (!result.done) {
+	iter.push(result.value);
+	set.erase(result.value);
+	result = a.next();
+}
+console.log("iter", iter);
+
+console.log(set);

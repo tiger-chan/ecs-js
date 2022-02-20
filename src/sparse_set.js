@@ -6,6 +6,7 @@ import { assert } from "./assert.js"
 class Iterator {
 	constructor(dense) {
 		this.#dense = dense;
+		this.#nextIdx = this.#dense.length - 1;
 	}
 
 	*[Symbol.iterator]() {
@@ -15,8 +16,26 @@ class Iterator {
 		}
 	}
 
+	next(reset) {
+		if (reset) {
+			this.#itCount = 0;
+			this.#nextIdx = this.dense.length - 1;
+		}
+
+		if (0 <= this.#nextIdx) {
+			return { value: this.#dense[this.#nextIdx--], done: false };
+		}
+		else {
+			return { value: this.#itCount, done: true };
+		}
+	}
+
 	/** @type {Array<any>} */
 	#dense = null;
+	/** @type {number} */
+	#nextIdx = 0;
+	/** @type {number} */
+	#itCount = 0;
 }
 
 export class SparseSet {
@@ -117,9 +136,11 @@ export class SparseSet {
 	#swap_pop = (first, last) => {
 		for (let it = first; it != last; ++it) {
 			let back = this.#sparse_ptr(this.#dense.back());
-			this.#sparse[back.page()][back.pos()] = combine(first, back);
-			const id = new SparseId(this.#dense[first]);
-			this.#dense[first] = this.#dense.back();
+			let popped = new SparseId(it);
+			let originalDense = this.#sparse[popped.page()][popped.pos()];
+			this.#sparse[back.page()][back.pos()] = combine(originalDense, back);
+			const id = new SparseId(this.#dense[originalDense]);
+			this.#dense[originalDense] = this.#dense.back();
 			this.#sparse[id.page()][id.pos()] = NULL;
 			this.#dense.pop();
 		}
