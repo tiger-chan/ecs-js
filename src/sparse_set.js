@@ -3,6 +3,22 @@ import { FixedArray } from "./fixed_array.js";
 import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
 import { assert } from "./assert.js"
 
+class Iterator {
+	constructor(dense) {
+		this.#dense = dense;
+	}
+
+	*[Symbol.iterator]() {
+		let x = this.#dense.length;
+		for (let i = x - 1; 0 <= i; --i) {
+			yield this.#dense[i];
+		}
+	}
+
+	/** @type {Array<any>} */
+	#dense = null;
+}
+
 export class SparseSet {
 	constructor() {
 		this.#freeList = NULL;
@@ -26,6 +42,10 @@ export class SparseSet {
 		id = new SparseId(id);
 		let ptr = this.#sparse_ptr(id);
 		return ptr && (ptr.version === id.version);
+	}
+
+	each() {
+		return new Iterator(this.#dense);
 	}
 
 	/**
