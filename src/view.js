@@ -1,5 +1,11 @@
 import { assert } from "./assert.js";
-import { SparseMap, Iterator as SparseMapIterator } from "./sparse_map.js";
+
+/**
+ * @typedef {import("./sparse_map.js").SparseMap} SparseMap
+ */
+/**
+ * @typedef {import("./sparse_map.js").Iterator} SparseMapIterator
+ */
 
 class ViewIterator {
 	/**
@@ -61,7 +67,7 @@ class ViewIterator {
 		}
 
 		return e;
-	}
+	};
 
 	/** @type {Map<string, SparseMap>} */
 	#components = null;

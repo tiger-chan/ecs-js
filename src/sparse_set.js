@@ -54,7 +54,7 @@ export class SparseSet {
 		return new Iterator(this.#dense);
 	}
 
-	_emplace(id, mixin = { push() { }, update(pos) { } }) {
+	_emplace(id, mixin = { push() { }, update(_pos) { } }) {
 		assert(() => !this.contains(id), `Already contains entry ${id}`);
 		let elem = this.#ensure_space(new SparseId(id));
 
@@ -84,7 +84,7 @@ export class SparseSet {
 		return this._emplace(id);
 	}
 
-	_erase(id, mixin = { swap(posA, posB) { }, pop() { } }) {
+	_erase(id, mixin = { swap(_posA, _posB) { }, pop() { } }) {
 		const start = this.#index(id);
 		this.#swap_pop(start, start + 1, mixin);
 	}
@@ -120,10 +120,10 @@ export class SparseSet {
 	}
 
 	#index = (x) => {
-		assert(() => this.contains(x), "Set does not contain entity")
+		assert(() => this.contains(x), "Set does not contain entity");
 		let ptr = this.#sparse_ptr(new SparseId(x));
 		return ptr.id;
-	}
+	};
 
 	/**
 	 * 
@@ -134,7 +134,6 @@ export class SparseSet {
 		const page = id.page();
 		const pos = id.pos();
 
-		let len = this.#sparse.length;
 		if (!(page < this.#sparse.length)) {
 			// resize the array such that has as many pages as needed.
 			this.#sparse.resize(page + 1, null);
@@ -150,7 +149,7 @@ export class SparseSet {
 		let elem = new SparseId(this.#sparse[page][pos] = combine(id.id, NULL));
 		assert(() => elem.version == toVersion(NULL), "Slot not available");
 		return elem;
-	}
+	};
 
 	/**
 	 *
@@ -171,7 +170,7 @@ export class SparseSet {
 			this.#dense.pop();
 			mixin.pop();
 		}
-	}
+	};
 
 	/**
 	 * 
@@ -185,7 +184,7 @@ export class SparseSet {
 		let page = id.page();
 		let pos = id.pos();
 		return (page < this.#sparse.length && this.#sparse[page][pos] !== NULL) ? new SparseId(id.toNumber()) : null;
-	}
+	};
 
 	/** @type {Array<number>} */
 	#dense = new Vector();

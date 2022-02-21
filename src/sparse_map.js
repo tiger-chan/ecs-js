@@ -1,6 +1,4 @@
 import { SparseSet } from "./sparse_set.js";
-import { NULL } from "./constants.js";
-import { combine } from "./sparse_id.js";
 import { Vector } from "./stl.js";
 
 export class Iterator {
@@ -60,8 +58,8 @@ export class SparseMap extends SparseSet {
 	emplace(id, data = null) {
 		let storage = this.#storage;
 		let handler = {
-			push() { storage.push(data) },
-			update(pos) { storage[pos] = data | {} }
+			push() { storage.push(data); },
+			update(pos) { storage[pos] = data | {}; }
 		};
 		return super._emplace(id, handler);
 	}
@@ -93,4 +91,4 @@ export class SparseMap extends SparseSet {
 
 	/** @type {Array<any>} */
 	#storage = new Vector();
-};
+}

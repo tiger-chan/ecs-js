@@ -1,7 +1,7 @@
 import { assert } from "./assert.js";
 import { NULL, RESERVED } from "./constants.js";
 import { combine, construct, toId, toVersion } from "./sparse_id.js";
-import { Iterator, SparseMap } from "./sparse_map.js";
+import { SparseMap } from "./sparse_map.js";
 import { Vector } from "./stl.js";
 import { View } from "./view.js";
 
@@ -91,14 +91,14 @@ export class Registry {
 	#gen_id = (pos) => {
 		assert(() => pos < toId(NULL), "No more entities available");
 		return pos;
-	}
+	};
 
 	#recycle_id = () => {
 		assert(() => this.#freeList != NULL, "Freelist is empty, but attempted to recycle id");
 		const cur = toId(this.#freeList);
 		this.#freeList = combine(this.#entities[cur], RESERVED);
 		return this.#entities[cur] = combine(cur, this.#entities[cur]);
-	}
+	};
 
 	/**
 	 * Release the entity and place it in the free list
@@ -108,11 +108,11 @@ export class Registry {
 	 */
 	#release_id = (entity, version) => {
 		// if version is equal to the reserved value add one so it loops over when masked and changes to 0
-		const ver = version + (version == toVersion(RESERVED))
+		const ver = version + (version == toVersion(RESERVED));
 		this.#entities[toId(entity)] = construct(this.#freeList, ver);
 		this.#freeList = combine(entity, RESERVED);
 		return ver;
-	}
+	};
 
 	/** @type {Map<string, SparseMap>} */
 	#pools = new Map();

@@ -3,7 +3,7 @@
  * @param {number} size 
  * @returns {Array<any>}
  */
- export function FixedArray(size) {
+export function FixedArray(size) {
 	let a = new Array(size);
 
 	a.__size = 0;

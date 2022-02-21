@@ -1,5 +1,4 @@
-import { Registry } from "./registry.js"
-import * as std from "./stl.js";
+import { Registry } from "./registry.js";
 
 class Position {
 	constructor(x = 0, y = x, z = x) {
@@ -10,7 +9,7 @@ class Position {
 	x = 0;
 	y = 0;
 	z = 0;
-};
+}
 
 let reg = new Registry();
 let a = reg.create();
