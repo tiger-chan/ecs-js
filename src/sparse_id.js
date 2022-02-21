@@ -19,7 +19,7 @@ export function toId(x) {
 }
 
 /**
- * 
+ * Combines the id of the with the version of the second
  * @param {number} lhs Id portion is given
  * @param {number} rhs Version portion is given
  * @returns {number} lhs.id | rhs.version;
@@ -27,6 +27,15 @@ export function toId(x) {
 export function combine(lhs, rhs) {
 	const vMask = VERSION_MASK << VERSION_SHIFT;
 	return (lhs & ID_MASK) | (rhs & vMask);
+}
+
+/**
+ * creates a new id using the id of the first and attaching the version provided
+ * @param {number} lhs
+ * @param {number} ver
+ */
+export function construct(lhs, ver) {
+	return toId(lhs) | (ver << VERSION_SHIFT);
 }
 
 export class SparseId {

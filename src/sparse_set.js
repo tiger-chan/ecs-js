@@ -97,6 +97,19 @@ export class SparseSet {
 		this._erase(id);
 	}
 
+	/**
+	 * Remove entry if present
+	 * @param {number} id
+	 * @returns {boolean} returns true if removed, false if it wasn't contained.
+	 */
+	remove(id) {
+		return this.contains(id) && (this.erase(id), true);
+	}
+
+	size() {
+		return this.#dense.length;
+	}
+
 	_get(id) {
 		let ptr = this.#sparse_ptr(id);
 		return this.#sparse[ptr.page()][ptr.pos()];
