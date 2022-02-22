@@ -4,7 +4,7 @@ import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
 import { assert } from "./assert.js";
 import { Vector } from "./stl.js";
 
-class Iterator {
+export class SparseSetIterator {
 	constructor(dense) {
 		this.#dense = dense;
 		this.#nextIdx = this.#dense.length - 1;
@@ -17,6 +17,11 @@ class Iterator {
 		}
 	}
 
+	/**
+	 *
+	 * @param {boolean} reset
+	 * @returns {{value: number, done: boolean}}
+	 */
 	next(reset) {
 		if (reset) {
 			this.#itCount = 0;
@@ -51,11 +56,18 @@ export class SparseSet {
 	}
 
 	each() {
-		return new Iterator(this.#dense);
+		return new SparseSetIterator(this.#dense);
 	}
 
+	/**
+	 *
+	 * @param {number} id
+	 * @param {{ push: () => void, update: (pos: number) => void }} mixin
+	 * @returns {number}
+	 */
 	_emplace(id, mixin = { push() { }, update(_pos) { } }) {
 		assert(() => !this.contains(id), `Already contains entry ${id}`);
+		/** @type {SparseId | number} */
 		let elem = this.#ensure_space(new SparseId(id));
 
 		if (this.#freeList == NULL) {
@@ -84,6 +96,11 @@ export class SparseSet {
 		return this._emplace(id);
 	}
 
+	/**
+	 *
+	 * @param {number} id
+	 * @param {{ swap: (posA: number, posB: number) => void, pop: () => void }} mixin
+	 */
 	_erase(id, mixin = { swap(_posA, _posB) { }, pop() { } }) {
 		const start = this.#index(id);
 		this.#swap_pop(start, start + 1, mixin);
@@ -110,6 +127,11 @@ export class SparseSet {
 		return this.#dense.length;
 	}
 
+	/**
+	 *
+	 * @param {number} id
+	 * @returns {number}
+	 */
 	_get(id) {
 		let ptr = this.#sparse_ptr(id);
 		return this.#sparse[ptr.page()][ptr.pos()];
@@ -119,6 +141,11 @@ export class SparseSet {
 		return this.#dense;
 	}
 
+	/**
+	 *
+	 * @param {number} x
+	 * @returns {number}
+	 */
 	#index = (x) => {
 		assert(() => this.contains(x), "Set does not contain entity");
 		let ptr = this.#sparse_ptr(new SparseId(x));
@@ -155,14 +182,14 @@ export class SparseSet {
 	 *
 	 * @param {number} first
 	 * @param {number} last
-	 * @param {{swap: (posA, posB) => void, pop: () => void }} mixin
+	 * @param {{swap: (posA: number, posB: number) => void, pop: () => void }} mixin
 	 */
 	#swap_pop = (first, last, mixin) => {
 		for (let it = first; it != last; ++it) {
 			let back = this.#sparse_ptr(this.#dense.back());
 			let popped = new SparseId(it);
 			let originalDense = this.#sparse[popped.page()][popped.pos()];
-			this.#sparse[back.page()][back.pos()] = combine(originalDense, back);
+			this.#sparse[back.page()][back.pos()] = combine(originalDense, back.toNumber());
 			const id = new SparseId(this.#dense[originalDense]);
 			this.#dense[originalDense] = this.#dense.back();
 			mixin.swap(originalDense, this.#dense.length - 1);
@@ -174,7 +201,7 @@ export class SparseSet {
 
 	/**
 	 * 
-	 * @param {SparseId} id 
+	 * @param {SparseId | number} id
 	 * @returns {SparseId | null}
 	 */
 	#sparse_ptr = (id) => {

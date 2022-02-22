@@ -1,7 +1,9 @@
+/// <reference path="../types/sparse_set.d.ts" />
+
 import { SparseSet } from "./sparse_set.js";
 import { Vector } from "./stl.js";
 
-export class Iterator {
+export class SparseMapIterator {
 	constructor(dense, storage) {
 		this.#dense = dense;
 		this.#storage = storage;
@@ -41,12 +43,13 @@ export class Iterator {
 }
 
 export class SparseMap extends SparseSet {
-	constructor() {
+	constructor(ctor = null) {
 		super();
+		this.type = ctor;
 	}
 
 	each() {
-		return new Iterator(this._dense, this.#storage);
+		return new SparseMapIterator(this._dense, this.#storage);
 	}
 
 	/**

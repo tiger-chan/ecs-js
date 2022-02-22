@@ -1,3 +1,7 @@
+/// <reference path="../types/sparse_id.d.ts" />
+/// <reference path="../types/sparse_map.d.ts" />
+/// <reference path="../types/view.d.ts" />
+
 import { assert } from "./assert.js";
 import { NULL, RESERVED } from "./constants.js";
 import { combine, construct, toId, toVersion } from "./sparse_id.js";
@@ -38,17 +42,24 @@ export class Registry {
 		return this.#release_id(entity, version);
 	}
 
+	/**
+	 *
+	 * @param {number} entity
+	 * @param {string} pool 
+	 * @param {any} component
+	 * @returns {any}
+	 */
 	emplace(entity, pool, component) {
 		/** @type {SparseMap} */
 		let p = this.#pools.get(pool);
 		if (!p) {
-			this.#pools.set(pool, new SparseMap());
+			this.#pools.set(pool, new SparseMap(component.constructor));
 			p = this.#pools.get(pool);
-			p.type = component.constructor;
 		}
 		
 		assert(() => p.type == component.constructor, "Attempting to mix types with a pool");
 		p.emplace(entity, component);
+		return p.get(entity);
 	}
 
 	/**
@@ -108,13 +119,13 @@ export class Registry {
 	 */
 	#release_id = (entity, version) => {
 		// if version is equal to the reserved value add one so it loops over when masked and changes to 0
-		const ver = version + (version == toVersion(RESERVED));
+		const ver = version + ((version == toVersion(RESERVED)) ? 1 : 0);
 		this.#entities[toId(entity)] = construct(this.#freeList, ver);
 		this.#freeList = combine(entity, RESERVED);
 		return ver;
 	};
 
-	/** @type {Map<string, SparseMap>} */
+	/** @type {Map<string, SparseMap<any>>} */
 	#pools = new Map();
 	/** @type {Array<number>} */
 	#entities = new Vector();

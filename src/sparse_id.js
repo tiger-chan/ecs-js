@@ -11,7 +11,7 @@ export function toVersion(x) {
 
 /**
  * 
- * @param {number} id 
+ * @param {number} x
  * @returns {number} Id number
  */
 export function toId(x) {
@@ -39,7 +39,9 @@ export function construct(lhs, ver) {
 }
 
 export class SparseId {
-	/** @type {number} */
+	/**
+	 * @param {number} x
+	 */
 	constructor(x) {
 		this.id = toId(x);
 		this.version = toVersion(x);

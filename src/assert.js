@@ -9,8 +9,8 @@ export function enable_assert() {
 
 /**
  * 
- * @param {boolean} predicate 
- * @param  {...any} data 
+ * @param {() => boolean} predicate
+ * @param  {...any} data
  */
 export function assert(predicate, ...data) {
 	if (assert_enabled) {

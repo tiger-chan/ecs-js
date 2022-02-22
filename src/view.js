@@ -1,16 +1,12 @@
-import { assert } from "./assert.js";
+/// <reference path="../types/sparse_map.d.ts" />
+/// <reference path="../types/registry.d.ts" />
 
-/**
- * @typedef {import("./sparse_map.js").SparseMap} SparseMap
- */
-/**
- * @typedef {import("./sparse_map.js").Iterator} SparseMapIterator
- */
+import { assert } from "./assert.js";
 
 class ViewIterator {
 	/**
 	 * 
-	 * @param {Map<string, SparseMap>} components 
+	 * @param {Map<string, SparseMap<any>>} components
 	 * @param {string} leadWith
 	 */
 	constructor(components, leadWith) {
@@ -23,8 +19,10 @@ class ViewIterator {
 		let iter = this.#leadWith.each();
 		let result = iter.next();
 		while (!result.done) {
-			let id = result.value.id;
-			let entity = this.#buildEntityIfValid(id, result.value.value);
+			/** @type {SparseMapIteratorResult<any>} */
+			const rValue = result.value;
+			let id = rValue.id;
+			let entity = this.#buildEntityIfValid(id, rValue.value);
 			if (entity) {
 				yield entity;
 			}
@@ -77,7 +75,7 @@ class ViewIterator {
 
 	/** @type {SparseMapIterator} */
 	#iter = null;
-	/** @type {Iterable<any>} */
+	/** @type {IteratorResult<any>} */
 	#iterResult = null;
 	/** @type {number} */
 	#itCount = 0;
