@@ -1,39 +1,39 @@
 {
-  "name": "@tiger_chan/ecs",
-  "version": "0.5.0",
-  "description": "Simple ECS implementation for JavaScript",
-  "main": "./src/index.js",
-  "types": "./types/index.d.ts",
-  "exports": "./src/index.js",
-  "repository": {
-    "url": "git+https://github.com/tiger-chan/ecs-js.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "type": "module",
-  "author": "Anthony Young",
-  "license": "MIT",
-  "devDependencies": {
-    "eslint": "^8.9.0"
-  },
-  "bugs": {
-    "url": "https://github.com/tiger-chan/ecs-js/issues"
-  },
-  "homepage": "https://github.com/tiger-chan/ecs-js#readme",
-  "directories": {
-    "doc": "docs"
-  },
-  "engines": {
-	  "node": "^14.0.0"
-  },
-  "keywords": [
-    "ecs",
-    "entity-component-system",
-    "sparse-set",
-	"gamedev",
-	"entity",
-	"component",
-	"system"
-  ]
+	"name": "@tiger_chan/ecs",
+	"version": "0.5.0",
+	"description": "Simple ECS implementation for JavaScript",
+	"main": "./src/index.js",
+	"types": "./types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tiger-chan/ecs-js.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"type": "module",
+	"author": "Anthony Young",
+	"license": "MIT",
+	"devDependencies": {
+		"eslint": "^8.9.0"
+	},
+	"bugs": {
+		"url": "https://github.com/tiger-chan/ecs-js/issues"
+	},
+	"homepage": "https://github.com/tiger-chan/ecs-js#readme",
+	"directories": {
+		"doc": "docs"
+	},
+	"engines": {
+		"node": ">=14.0.0"
+	},
+	"keywords": [
+		"ecs",
+		"entity-component-system",
+		"sparse-set",
+		"gamedev",
+		"entity",
+		"component",
+		"system"
+	]
 }
