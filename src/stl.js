@@ -1,25 +1,65 @@
+/// <reference path="../types/index.d.ts" />
+/// <reference path="../types/stl.d.ts" />
+
 /**
- * 
  * @param {number} size Array Length
- * @returns {Array<any>}
  */
 export function Vector(size = 0) {
+	/** @type {std.Vector<any>} */
+	let a = new Array(size);
+
+	a.__size = 0;
 	let back = function () {
-		if (this.length > 0) {
-			return this[this.length - 1];
+		if (0 < this.__size) {
+			return this[this.__size - 1];
 		}
 		return null;
+	}
+
+	let capacity = function () {
+		return this.length;
 	};
 
-	let resize = function (newSize, defaultValue) {
+	let newSize = function () {
+		return this.__size;
+	};
+
+	/** @this {std.Vector<any>} */
+	const resize = function (newSize, defaultValue) {
+		// @ts-ignore
 		while (newSize > this.length)
+			// @ts-ignore
 			this.push(defaultValue);
 		this.length = newSize;
+		return this.length;
 	};
 
-	let a = new Array(size);
-	a.back = back.bind(a);
+	let oldPush = Array.prototype.push;
+	/** @this {std.Vector<any>} */
+	let newPush = function (x) {
+		this.__size++;
+		return oldPush.call(this, x);
+	};
+
+	/** @this {std.Vector<any>} */
+	let newPop = function () {
+		if (0 < this.__size) {
+			--this.__size;
+			let val = this[this.__size];
+			delete this[this.__size];
+			this.length = this.__size;
+			return val;
+		}
+		return undefined;
+	};
+
+	a.capacity = capacity.bind(a);
+	a.size = newSize.bind(a);
+	a.push = newPush.bind(a);
+	a.pop = newPop.bind(a);
 	a.resize = resize.bind(a);
+	a.back = back.bind(a);
+	a.length = size;
 	return a;
 }
 

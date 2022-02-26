@@ -1,10 +1,12 @@
-declare module "@tiger_chan/ecs" {
-
+export = Ecs;
+export as namespace Ecs;
+export default Ecs;
+declare namespace Ecs {
 	/**
-	 * 
-	 * @param {number} x 
-	 * @returns {number} Version number
-	 */
+		 *
+		 * @param {number} x
+		 * @returns {number} Version number
+		 */
 	export declare function toVersion(x: number): number;
 
 	/**
@@ -40,18 +42,17 @@ declare module "@tiger_chan/ecs" {
 		version: number;
 	}
 
-
-	declare class SparseSetIterator implements Iterator<number, number>, Iterable<number> {
+	export declare class SparseSetIterator implements Iterator<number, number>, Iterable<number> {
 		constructor(dense: Array<number>);
 		[Symbol.iterator](): Iterator<number>;
 		next(reset?: boolean): IteratorResult<number, number>;
 	}
 
-	declare class SparseSet {
+	export declare class SparseSet<IteratorType = SparseSetIterator> {
 		/**
 		 * @returns {SparseSetIterator} Iterator for the set
 		 */
-		each(): SparseSetIterator | any;
+		each(): IteratorType;
 		/**
 		 * 
 		 * @param id Id to test the presence of
@@ -82,25 +83,33 @@ declare module "@tiger_chan/ecs" {
 		 * @returns {number} The size of the collection
 		 */
 		size(): number;
+
+		protected get _dense();
+		protected _emplace(id: number, handler: {
+			push(): void;
+			update(pos: any): void;
+		});
+		protected _erase(id: number, handler: {
+			swap: (posA, posB) => void,
+			pop: () => void
+		});
+
+		protected _get(id: number): number;
 	}
 
-	declare export interface SparseMapIteratorResult<T> {
+	export declare interface SparseMapIteratorResult<T> {
 		id: number;
 		value: T;
 	}
 
-	declare export class SparseMapIterator<T> implements Iterator<SparseMapIteratorResult<T>, number>, Iterable<SparseMapIteratorResult<T>> {
+	export declare class SparseMapIterator<T> implements Iterable<SparseMapIteratorResult<T>>, Iterator<SparseMapIteratorResult<T>, number, bool> {
 		constructor(dense: Array<number>);
 		[Symbol.iterator](): Iterator<SparseMapIteratorResult<T>>;
 		next(reset?: boolean): IteratorResult<SparseMapIteratorResult<T>, number>;
 	}
 
-	declare export class SparseMap<T> extends SparseSet {
-		/**
-		 * @returns {SparseMapIterator} Iterator for the set
-		 */
-		override each(): SparseMapIterator<T>;
-
+	export declare class SparseMap<T> extends SparseSet<SparseMapIterator<T>> {
+		constructor(ctor?: new () => T);
 		/**
 		 *
 		 * @param {number} id preferred id to emplace if available
@@ -122,20 +131,22 @@ declare module "@tiger_chan/ecs" {
 		 * @param {T} data Data to replace what is stored
 		 */
 		patch(id: number, data: T): void;
+
+		type?: new () => T;
 	}
 
 
-	declare export class ViewIterator<Components extends any[]> implements Iterable<[number, ...Components], number>, Iterable<[number, ...Components]> {
+	export declare class ViewIterator<Components extends any[]> implements Iterable<[number, ...Components], number>, Iterable<[number, ...Components]> {
 		constructor(components: SparseMap<any>[], leadWith: string);
 
-		[Symbol.iterator](): Iterator<[number, number, ...Components]>;
-		next(reset?: boolean): IteratorResult<[number, number, ...Components], number>;
+		[Symbol.iterator](): Iterator<[number, ...Components]>;
+		next(reset?: boolean): IteratorResult<[number, ...Components], number>;
 	}
 
-	declare export class View<Components extends any[]> {
+	export declare class View<Components extends any[]> {
 		constructor(reg: Registry, components: [...SparseMap<Components>[]], leadWith: string);
 
-		each(): ViewIterator<Components>;
+		each(): ViewIterator<[...Components]>;
 
 		/**
 		 * Retrieve the value stored for the entity and pool requested
@@ -146,6 +157,9 @@ declare module "@tiger_chan/ecs" {
 	}
 
 	export declare class Registry {
+		all_of(entity, ...components): boolean;
+		any_of(entity, ...components): boolean;
+
 		/**
 		 * @returns {number} new entity id
 		 */
@@ -167,6 +181,8 @@ declare module "@tiger_chan/ecs" {
 		 * @returns {T} The component that was inserted
 		 */
 		emplace<T>(entity: number, pool: string, component: T): T;
+
+		remove(entity: number, ...components: string[]): void;
 
 		/**
 		 * Checks the validity of entity

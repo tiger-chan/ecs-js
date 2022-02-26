@@ -1,6 +1,4 @@
-/// <reference path="../types/sparse_id.d.ts" />
-/// <reference path="../types/sparse_map.d.ts" />
-/// <reference path="../types/view.d.ts" />
+/// <reference path="../types/index.d.ts" />
 
 import { assert } from "./assert.js";
 import { NULL, RESERVED } from "./constants.js";
@@ -9,14 +7,47 @@ import { SparseMap } from "./sparse_map.js";
 import { Vector } from "./stl.js";
 import { View } from "./view.js";
 
+/**
+ * @implements {Ecs.Registry}
+ */
 export class Registry {
+	all_of(entity, ...components) {
+		for (let component of components) {
+			if (!this.#pools.has(component)) {
+				this.#pools.set(component, new SparseMap);
+			}
+
+			let p = this.#pools.get(component);
+			if (!p.contains(entity)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	any_of(entity, ...components) {
+		for (let component of components) {
+			if (!this.#pools.has(component)) {
+				this.#pools.set(component, new SparseMap);
+			}
+
+			let p = this.#pools.get(component);
+			if (p.contains(entity)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * @returns {number} new entity id
 	 */
 	create() {
 		let id = NULL;
 		if (this.#freeList === NULL) {
-			id = this.#gen_id(this.#entities.length);
+			id = this.#gen_id(this.#entities.size());
 			this.#entities.push(id);
 		}
 		else {
@@ -50,16 +81,31 @@ export class Registry {
 	 * @returns {any}
 	 */
 	emplace(entity, pool, component) {
-		/** @type {SparseMap} */
 		let p = this.#pools.get(pool);
 		if (!p) {
 			this.#pools.set(pool, new SparseMap(component.constructor));
 			p = this.#pools.get(pool);
 		}
-		
+		else if (!p.type) {
+			p.type = component.constructor;
+		}
+
 		assert(() => p.type == component.constructor, "Attempting to mix types with a pool");
-		p.emplace(entity, component);
+		if (!p.contains(entity)) {
+			p.emplace(entity, component);
+		}
 		return p.get(entity);
+	}
+
+	remove(entity, ...components) {
+		for (let component of components) {
+			if (!this.#pools.has(component)) {
+				this.#pools.set(component, new SparseMap);
+			}
+
+			let p = this.#pools.get(component);
+			p.remove(entity);
+		}
 	}
 
 	/**
@@ -67,19 +113,19 @@ export class Registry {
 	 */
 	valid(entity) {
 		let id = toId(entity);
-		return id < this.#entities.length && this.#entities[id] == entity;
+		return id < this.#entities.size() && this.#entities[id] == entity;
 	}
 
-	/**
-	 * 
-	 * @param  {...string} components Pool names
-	 */
 	view(...components) {
 		assert(() => components.length > 0, "Attempting to iterate a view with no components");
 		let comps = new Map();
 		let smallest = null;
 		let smallestSize = Number.MAX_SAFE_INTEGER;
 		for (let component of components) {
+			if (!this.#pools.has(component)) {
+				this.#pools.set(component, new SparseMap);
+			}
+
 			assert(() => this.#pools.has(component), `Attempting to create a view without registered component (${component})`);
 			let pool = this.#pools.get(component);
 			let size = pool.size();
@@ -125,9 +171,10 @@ export class Registry {
 		return ver;
 	};
 
-	/** @type {Map<string, SparseMap<any>>} */
+	/** @type {Map<string, Ecs.SparseMap<any>>} */
 	#pools = new Map();
-	/** @type {Array<number>} */
+	/** @type {std.Vector<number>} */
+	// @ts-ignore
 	#entities = new Vector();
 	#freeList = NULL;
 }

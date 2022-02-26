@@ -38,6 +38,9 @@ export function construct(lhs, ver) {
 	return toId(lhs) | (ver << VERSION_SHIFT);
 }
 
+/**
+ * @implements {Ecs.SparseId}
+ */
 export class SparseId {
 	/**
 	 * @param {number} x

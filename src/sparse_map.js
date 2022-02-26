@@ -1,40 +1,68 @@
-/// <reference path="../types/sparse_set.d.ts" />
+/// <reference path="../types/index.d.ts" />
 
 import { SparseSet } from "./sparse_set.js";
 import { Vector } from "./stl.js";
 
+export class SparseMapIteratorResult {
+	constructor(id, value) {
+		this.id = id;
+		this.value = value;
+	}
+	/** @type {number} */
+	id = 0;
+	/** @type {any} */
+	value = {};
+}
+
+/**
+ * @implements {Ecs.SparseMapIterator}
+ */
 export class SparseMapIterator {
+	/**
+	 *
+	 * @param {std.Vector<number>} dense
+	 * @param {std.Vector<any>} storage
+	 */
 	constructor(dense, storage) {
 		this.#dense = dense;
 		this.#storage = storage;
-		this.#nextIdx = this.#dense.length - 1;
+		this.#nextIdx = this.#dense.size() - 1;
 	}
 
 	*[Symbol.iterator]() {
-		let x = this.#dense.length;
-		for (let i = x - 1; 0 <= i; --i) {
-			yield { id: this.#dense[i], value: this.#storage[i] };
+		for (let i = this.#dense.size() - 1; 0 <= i; --i) {
+			yield new SparseMapIteratorResult(this.#dense[i], this.#storage[i]);
 		}
 	}
 
-	next(reset) {
+	/**
+	 *
+	 * @param {boolean} [reset=false]
+	 * @returns {IteratorResult<any, number>}
+	 */
+	next(reset = false) {
 		if (reset) {
 			this.#itCount = 0;
-			this.#nextIdx = this.#dense.length - 1;
+			this.#nextIdx = this.#dense.size() - 1;
 		}
 
 		if (0 <= this.#nextIdx) {
 			let i = this.#nextIdx--;
-			return { value: { id: this.#dense[i], value: this.#storage[i] }, done: false };
+			/** @type {IteratorYieldResult<Ecs.SparseMapIteratorResult<any>, number>} */
+			let result = { value: new SparseMapIteratorResult(this.#dense[i], this.#storage[i]) };
+			return result;
 		}
 		else {
-			return { value: this.#itCount, done: true };
+			/** @type {IteratorReturnResult<number>} */
+			let result = { value: this.#itCount, done: true };
+
+			return result;
 		}
 	}
 
-	/** @type {Array<number>} */
+	/** @type {std.Vector<number>} */
 	#dense = null;
-	/** @type {Array<any>} */
+	/** @type {std.Vector<any>} */
 	#storage = null;
 	/** @type {number} */
 	#nextIdx = 0;
@@ -42,7 +70,15 @@ export class SparseMapIterator {
 	#itCount = 0;
 }
 
+/**
+ * @extends {Ecs.SparseSet<any>}
+ * @implements {Ecs.SparseMap<any>}
+ */
 export class SparseMap extends SparseSet {
+	/**
+	 *
+	 * @param {new (...args: any[]) => any} ctor
+	 */
 	constructor(ctor = null) {
 		super();
 		this.type = ctor;
@@ -62,7 +98,7 @@ export class SparseMap extends SparseSet {
 		let storage = this.#storage;
 		let handler = {
 			push() { storage.push(data); },
-			update(pos) { storage[pos] = data | {}; }
+			update(pos) { storage[pos] = data || {}; }
 		};
 		return super._emplace(id, handler);
 	}
@@ -92,6 +128,9 @@ export class SparseMap extends SparseSet {
 		this.#storage[dense] = data;
 	}
 
-	/** @type {Array<any>} */
+	/** @type {std.Vector<any>} */
+	//@ts-ignore
 	#storage = new Vector();
+	/** @type {new (...args: any[]) => any} */
+	type = null;
 }

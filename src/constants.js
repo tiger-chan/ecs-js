@@ -1,4 +1,4 @@
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 1000;
 const ID = 0xFFFFF;
 const VERSION = 0xFFF;
 export const VERSION_SHIFT = 20;

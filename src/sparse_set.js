@@ -1,17 +1,20 @@
-import { PAGE_SIZE, NULL } from "./constants.js";
+import { PAGE_SIZE, NULL, RESERVED } from "./constants.js";
 import { FixedArray } from "./fixed_array.js";
 import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
 import { assert } from "./assert.js";
 import { Vector } from "./stl.js";
 
+/**
+ * @implements {Ecs.SparseSetIterator}
+ */
 export class SparseSetIterator {
 	constructor(dense) {
 		this.#dense = dense;
-		this.#nextIdx = this.#dense.length - 1;
+		this.#nextIdx = this.#dense.size() - 1;
 	}
 
 	*[Symbol.iterator]() {
-		let x = this.#dense.length;
+		let x = this.#dense.size();
 		for (let i = x - 1; 0 <= i; --i) {
 			yield this.#dense[i];
 		}
@@ -25,7 +28,7 @@ export class SparseSetIterator {
 	next(reset) {
 		if (reset) {
 			this.#itCount = 0;
-			this.#nextIdx = this.#dense.length - 1;
+			this.#nextIdx = this.#dense.size() - 1;
 		}
 
 		if (0 <= this.#nextIdx) {
@@ -36,7 +39,7 @@ export class SparseSetIterator {
 		}
 	}
 
-	/** @type {Array<any>} */
+	/** @type {std.Vector<any>} */
 	#dense = null;
 	/** @type {number} */
 	#nextIdx = 0;
@@ -44,6 +47,9 @@ export class SparseSetIterator {
 	#itCount = 0;
 }
 
+/**
+ * @extends {Ecs.SparseSet}
+ */
 export class SparseSet {
 	constructor() {
 		this.#freeList = NULL;
@@ -137,6 +143,9 @@ export class SparseSet {
 		return this.#sparse[ptr.page()][ptr.pos()];
 	}
 
+	/**
+	 * @protected
+	 */
 	get _dense() {
 		return this.#dense;
 	}
@@ -167,6 +176,7 @@ export class SparseSet {
 		}
 
 		if (!this.#sparse[page]) {
+			// @ts-ignore
 			this.#sparse[page] = new FixedArray(PAGE_SIZE);
 			this.#sparse[page].fill(NULL, 0, PAGE_SIZE);
 		}
@@ -185,14 +195,25 @@ export class SparseSet {
 	 * @param {{swap: (posA: number, posB: number) => void, pop: () => void }} mixin
 	 */
 	#swap_pop = (first, last, mixin) => {
+		if (this.#dense.size() == 0) {
+			return;
+		}
+
 		for (let it = first; it != last; ++it) {
-			let back = this.#sparse_ptr(this.#dense.back());
-			let popped = new SparseId(it);
-			let originalDense = this.#sparse[popped.page()][popped.pos()];
-			this.#sparse[back.page()][back.pos()] = combine(originalDense, back.toNumber());
-			const id = new SparseId(this.#dense[originalDense]);
-			this.#dense[originalDense] = this.#dense.back();
-			mixin.swap(originalDense, this.#dense.length - 1);
+			let sparseId = new SparseId(it);
+			let popped = this.#sparse[sparseId.page()][sparseId.pos()];
+
+			let sparseIdx = this.#dense.back();
+			let newBack = combine(popped, this.#dense.back());
+			let backId = this.#sparse_ptr(sparseIdx);
+			this.#sparse[backId.page()][backId.pos()] = newBack;
+
+			let denseId = this.#dense[popped];
+			this.#dense[popped] = this.#dense.back();
+			this.#dense[this.#dense.size() - 1] = NULL;
+			mixin.swap(popped, this.#dense.size() - 1);
+
+			const id = new SparseId(denseId);
 			this.#sparse[id.page()][id.pos()] = NULL;
 			this.#dense.pop();
 			mixin.pop();
@@ -210,12 +231,14 @@ export class SparseSet {
 		}
 		let page = id.page();
 		let pos = id.pos();
-		return (page < this.#sparse.length && this.#sparse[page][pos] !== NULL) ? new SparseId(id.toNumber()) : null;
+		return (page < this.#sparse.size() && this.#sparse[page][pos] !== NULL) ? new SparseId(id.toNumber()) : null;
 	};
 
-	/** @type {Array<number>} */
+	/** @type {std.Vector<number>} */
+	// @ts-ignore
 	#dense = new Vector();
-	/** @type {Array<Array<number>>} */
+	/** @type {std.Vector<std.FixedArray<number>>} */
+	// @ts-ignore
 	#sparse = new Vector();
 	/** @type {number} */
 	#freeList = NULL;
