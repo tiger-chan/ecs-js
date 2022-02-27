@@ -1,6 +1,15 @@
-export * from "./sparse_id.js";
-export * from "./stl.js";
-export * from "./sparse_set.js";
-export * from "./sparse_map.js";
-export * from "./view.js";
-export * from "./registry.js";
+import * as sparse_id from "./sparse_id.js";
+import * as stl from "./stl.js";
+import * as sparse_set  from "./sparse_set.js";
+import * as sparse_map from "./sparse_map.js";
+import * as view  from "./view.js";
+import * as registry from "./registry.js";
+
+export default {
+	...sparse_id,
+	...stl,
+	...sparse_set,
+	...sparse_map,
+	...view,
+	...registry
+};

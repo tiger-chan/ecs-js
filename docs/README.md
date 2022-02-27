@@ -1,5 +1,6 @@
 # ECS JS
 
+Simple ESM ECS implementation using sparse sets.
 
 ```javascript
 import { Registry } from "./registry.js"
