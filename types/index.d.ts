@@ -3,6 +3,10 @@ export as namespace Ecs;
 export default Ecs;
 declare namespace Ecs {
 	/**
+	 * Null value of an entity
+	 */
+	export declare const NULL: number;
+	/**
 		 *
 		 * @param {number} x
 		 * @returns {number} Version number
