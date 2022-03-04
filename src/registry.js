@@ -8,6 +8,16 @@ import { Vector } from "./stl.js";
 import { View } from "./view.js";
 
 /**
+ * @param {string} component
+ */
+export function exclude(component) {
+	return {
+		exclude: true,
+		name: component
+	};
+}
+
+/**
  * @implements {Ecs.Registry}
  */
 export class Registry {
@@ -119,25 +129,52 @@ export class Registry {
 	view(...components) {
 		assert(() => components.length > 0, "Attempting to iterate a view with no components");
 		let comps = new Map();
+		let excludes = new Map();
 		let smallest = null;
 		let smallestSize = Number.MAX_SAFE_INTEGER;
 		for (let component of components) {
-			if (!this.#pools.has(component)) {
-				this.#pools.set(component, new SparseMap);
+			let compName = component;
+			let poolAdd = (name, pool) => {
+				comps.set(name, pool);
+			}
+			let getMin = (comp, size) => {
+				if (smallestSize > size) {
+					return [comp, size];
+				}
+				return [smallest, smallestSize];
+			}
+			if (typeof(component) == "object") {
+				compName = compName.name;
+				poolAdd = (name, pool) => {
+					excludes.set(name, pool);
+				}
+				getMin = () => {
+					return [smallest, smallestSize];
+				}
 			}
 
-			assert(() => this.#pools.has(component), `Attempting to create a view without registered component (${component})`);
-			let pool = this.#pools.get(component);
-			let size = pool.size();
-			if (smallestSize > size) {
-				smallest = component;
-				smallestSize = size;
+			if (!this.#pools.has(compName)) {
+				this.#pools.set(compName, new SparseMap);
 			}
 
-			comps.set(component, pool);
+			assert(() => this.#pools.has(compName), `Attempting to create a view without registered component (${compName})`);
+			let pool = this.#pools.get(compName);
+			[smallest, smallestSize] = getMin(compName, pool.size());
+			poolAdd(compName, pool);
 		}
 
-		return new View(this, comps, smallest);
+		return new View(this, comps, excludes, smallest);
+	}
+
+	get(entity, component) {
+		if (!this.#pools.has(component)) {
+			assert(() => false, "Attempting to retrieve component from entity that doesn't have it");
+			return null;
+		}
+
+		let pool = this.#pools.get(component);
+		assert(() => pool.contains(entity), "Attempting to retrieve component from entity that doesn't have it");
+		return pool.get(entity);
 	}
 
 	/**

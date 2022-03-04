@@ -158,7 +158,19 @@ declare namespace Ecs {
 		 * @param {string} component The pool name for the component
 		 */
 		get<Component>(id: number, component: string): Component;
+
+		combine<T extends any[]>(view: View<T>): View<[...Components, ...T]>;
+		
+		get _components(): Map<string, SparseMap<any>>;
+		get _excludes(): Map<string, SparseMap<any>>;
+		get _leadWith(): string;
 	}
+
+	export declare interface IExclusion { exclude: true, name: string };
+
+	export declare function exclude(name: string): IExclusion;
+	
+	type ViewComponent = string | IExclusion;
 
 	export declare class Registry {
 		all_of(entity, ...components): boolean;
@@ -186,6 +198,14 @@ declare namespace Ecs {
 		 */
 		emplace<T>(entity: number, pool: string, component: T): T;
 
+		/**
+		 * Get component for entity from pool
+		 * @param entity Entity id
+		 * @param pool Name of the pool to retrieve
+		 * @returns {Component}
+		 */
+		get<Component>(entity: number, pool: string): Component;
+
 		remove(entity: number, ...components: string[]): void;
 
 		/**
@@ -199,6 +219,6 @@ declare namespace Ecs {
 		 * Returns a view which can be iterated
 		 * @param components Pool names
 		 */
-		view<T extends any[]>(...components: string[]): View<[...T]>;
+		view<T extends any[]>(...components: ViewComponent[]): View<[...T]>;
 	}
 }

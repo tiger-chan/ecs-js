@@ -1,7 +1,6 @@
 /// <reference path="../types/index.d.ts" />
 
 import { assert } from "./assert.js";
-import { NULL } from "./constants.js";
 
 /**
  * @implements {Ecs.ViewIterator}
@@ -12,8 +11,9 @@ class ViewIterator {
 	 * @param {Map<string, Ecs.SparseMap<any>>} components
 	 * @param {string} leadWith
 	 */
-	constructor(components, leadWith) {
+	constructor(components, excludes, leadWith) {
 		this.#components = components;
+		this.#excludes = excludes;
 		this.#leadWith = leadWith;
 	}
 
@@ -75,6 +75,13 @@ class ViewIterator {
 	#buildEntityIfValid = (entity) => {
 		/** @type {[number, ...any]} */
 		let e = [entity];
+		
+		for (let pool of this.#excludes) {
+			if (pool[1].contains(entity)) {
+				return null;
+			}
+		}
+
 		for (let pool of this.#components) {
 			if (!pool[1].contains(entity)) {
 				return null;
@@ -87,6 +94,8 @@ class ViewIterator {
 
 	/** @type {Map<string, Ecs.SparseMap<any>>} */
 	#components = null;
+	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	#excludes = null;
 	/** @type {string} */
 	#leadWith = null;
 
@@ -109,10 +118,37 @@ export class View {
 	 * @param {Map<string, Ecs.SparseMap<any>>} components
 	 * @param {string} leadWith
 	 */
-	constructor(reg, components, leadWith) {
+	constructor(reg, components, excludes, leadWith) {
 		this.#reg = reg;
 		this.#components = components;
+		this.#excludes = excludes;
 		this.#leadWith = leadWith;
+	}
+
+	/**
+	 *
+	 * @param {Ecs.View} otherView
+	 * @returns {Ecs.View}
+	 */
+	combine(otherView) {
+		let comps = new Map(this.#components);
+		for (let comp of otherView._components) {
+			comps.set(comp[0], comp[1]);
+		}
+
+		let excludes = new Map(this.#excludes);
+		for (let comp of otherView._excludes) {
+			comps.set(comp[0], comp[1]);
+		}
+
+		let leadWith = this.#leadWith;
+		let leadWithComp = comps.get(leadWith);
+		let leadWithOtherComp = comps.get(otherView._leadWith);
+		if (leadWithComp.size() > leadWithOtherComp.size()) {
+			leadWith = otherView._leadWith;
+		}
+
+		return new View(this.#reg, comps, excludes, leadWith);
 	}
 
 	/**
@@ -120,7 +156,7 @@ export class View {
 	 * @returns {Ecs.ViewIterator<any[]>}
 	 */
 	each() {
-		return new ViewIterator(new Map(this.#components), this.#leadWith);
+		return new ViewIterator(new Map(this.#components), new Map(this.#excludes), this.#leadWith);
 	}
 
 	/**
@@ -138,10 +174,24 @@ export class View {
 		return pool.get(id);
 	}
 
+	get _components() {
+		return this.#components;
+	}
+
+	get _excludes() {
+		return this.#excludes;
+	}
+
+	get _leadWith() {
+		return this.#leadWith;
+	}
+
 	/** @type {Ecs.Registry} */
 	#reg = null;
 	/** @type {Map<string, Ecs.SparseMap<any>>} */
 	#components = null;
+	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	#excludes = null;
 	/** @type {string} */
 	#leadWith = null;
 }
