@@ -39,7 +39,7 @@ export function construct(lhs, ver) {
 }
 
 /**
- * @implements {Ecs.SparseId}
+ * @implements {ecs.SparseId}
  */
 export class SparseId {
 	/**

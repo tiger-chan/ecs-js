@@ -15,7 +15,7 @@ export class SparseMapIteratorResult {
 }
 
 /**
- * @implements {Ecs.SparseMapIterator}
+ * @implements {ecs.SparseMapIterator}
  */
 export class SparseMapIterator {
 	/**
@@ -48,7 +48,7 @@ export class SparseMapIterator {
 
 		if (0 <= this.#nextIdx) {
 			let i = this.#nextIdx--;
-			/** @type {IteratorYieldResult<Ecs.SparseMapIteratorResult<any>, number>} */
+			/** @type {IteratorYieldResult<ecs.SparseMapIteratorResult<any>, number>} */
 			let result = { value: new SparseMapIteratorResult(this.#dense[i], this.#storage[i]) };
 			return result;
 		}
@@ -71,8 +71,8 @@ export class SparseMapIterator {
 }
 
 /**
- * @extends {Ecs.SparseSet<any>}
- * @implements {Ecs.SparseMap<any>}
+ * @extends {ecs.SparseSet<any>}
+ * @implements {ecs.SparseMap<any>}
  */
 export class SparseMap extends SparseSet {
 	/**

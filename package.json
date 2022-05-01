@@ -1,12 +1,12 @@
 {
-	"name": "@tiger_chan/ecs",
+	"name": "@tiger-chan/ecjs",
 	"version": "0.5.0",
 	"description": "Simple ECS implementation for JavaScript",
 	"main": "./src/index.js",
 	"types": "./types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tiger-chan/ecs-js.git"
+		"url": "https://github.com/tiger-chan/ecjs.git"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -18,9 +18,9 @@
 		"eslint": "^8.9.0"
 	},
 	"bugs": {
-		"url": "https://github.com/tiger-chan/ecs-js/issues"
+		"url": "https://github.com/tiger-chan/ecjs/issues"
 	},
-	"homepage": "https://github.com/tiger-chan/ecs-js#readme",
+	"homepage": "https://github.com/tiger-chan/ecjs#readme",
 	"directories": {
 		"doc": "docs"
 	},

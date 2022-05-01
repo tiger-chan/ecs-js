@@ -1,7 +1,7 @@
-export = Ecs;
-export as namespace Ecs;
-export default Ecs;
-declare namespace Ecs {
+export = ecs;
+export as namespace ecs;
+export default ecs;
+declare namespace ecs {
 	/**
 	 * Null value of an entity
 	 */

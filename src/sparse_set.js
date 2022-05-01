@@ -5,7 +5,7 @@ import { assert } from "./assert.js";
 import { Vector } from "./stl.js";
 
 /**
- * @implements {Ecs.SparseSetIterator}
+ * @implements {ecs.SparseSetIterator}
  */
 export class SparseSetIterator {
 	constructor(dense) {
@@ -48,7 +48,7 @@ export class SparseSetIterator {
 }
 
 /**
- * @extends {Ecs.SparseSet}
+ * @extends {ecs.SparseSet}
  */
 export class SparseSet {
 	constructor() {

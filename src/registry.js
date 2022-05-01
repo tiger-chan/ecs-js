@@ -18,7 +18,7 @@ export function exclude(component) {
 }
 
 /**
- * @implements {Ecs.Registry}
+ * @implements {ecs.Registry}
  */
 export class Registry {
 	all_of(entity, ...components) {
@@ -208,7 +208,7 @@ export class Registry {
 		return ver;
 	};
 
-	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	/** @type {Map<string, ecs.SparseMap<any>>} */
 	#pools = new Map();
 	/** @type {std.Vector<number>} */
 	// @ts-ignore

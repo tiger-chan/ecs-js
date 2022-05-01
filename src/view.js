@@ -3,12 +3,12 @@
 import { assert } from "./assert.js";
 
 /**
- * @implements {Ecs.ViewIterator}
+ * @implements {ecs.ViewIterator}
  */
 class ViewIterator {
 	/**
 	 *
-	 * @param {Map<string, Ecs.SparseMap<any>>} components
+	 * @param {Map<string, ecs.SparseMap<any>>} components
 	 * @param {string} leadWith
 	 */
 	constructor(components, excludes, leadWith) {
@@ -92,15 +92,15 @@ class ViewIterator {
 		return e;
 	};
 
-	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	/** @type {Map<string, ecs.SparseMap<any>>} */
 	#components = null;
-	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	/** @type {Map<string, ecs.SparseMap<any>>} */
 	#excludes = null;
 	/** @type {string} */
 	#leadWith = null;
 
 
-	/** @type {Ecs.SparseMapIterator<any>} */
+	/** @type {ecs.SparseMapIterator<any>} */
 	#iter = null;
 	/** @type {IteratorResult<any>} */
 	#iterResult = null;
@@ -109,13 +109,13 @@ class ViewIterator {
 }
 
 /**
- * @implements {Ecs.View}
+ * @implements {ecs.View}
  */
 export class View {
 	/**
 	 * 
-	 * @param {Ecs.Registry} reg
-	 * @param {Map<string, Ecs.SparseMap<any>>} components
+	 * @param {ecs.Registry} reg
+	 * @param {Map<string, ecs.SparseMap<any>>} components
 	 * @param {string} leadWith
 	 */
 	constructor(reg, components, excludes, leadWith) {
@@ -127,8 +127,8 @@ export class View {
 
 	/**
 	 *
-	 * @param {Ecs.View} otherView
-	 * @returns {Ecs.View}
+	 * @param {ecs.View} otherView
+	 * @returns {ecs.View}
 	 */
 	combine(otherView) {
 		let comps = new Map(this.#components);
@@ -153,7 +153,7 @@ export class View {
 
 	/**
 	 *
-	 * @returns {Ecs.ViewIterator<any[]>}
+	 * @returns {ecs.ViewIterator<any[]>}
 	 */
 	each() {
 		return new ViewIterator(new Map(this.#components), new Map(this.#excludes), this.#leadWith);
@@ -186,11 +186,11 @@ export class View {
 		return this.#leadWith;
 	}
 
-	/** @type {Ecs.Registry} */
+	/** @type {ecs.Registry} */
 	#reg = null;
-	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	/** @type {Map<string, ecs.SparseMap<any>>} */
 	#components = null;
-	/** @type {Map<string, Ecs.SparseMap<any>>} */
+	/** @type {Map<string, ecs.SparseMap<any>>} */
 	#excludes = null;
 	/** @type {string} */
 	#leadWith = null;
