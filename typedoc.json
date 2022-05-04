@@ -1,0 +1,22 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+	"name": "ECS JS",
+	"entryPoints": [
+		"types/index.d.ts"
+	],
+	"out": "docs/api",
+	"excludeExternals": true,
+	"excludePrivate": true,
+	"excludeProtected": true,
+	"disableSources": true,
+	"markedOptions": {
+		"mangle": false
+	},
+	"includes": ["types"],
+	"tsconfig": "jsconfig.json",
+	"validation": {
+		"notExported": true,
+		"invalidLink": true,
+		"notDocumented": false
+	}
+}

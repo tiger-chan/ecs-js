@@ -1,24 +1,25 @@
-export = ecs;
 export as namespace ecs;
 export default ecs;
+export = ecs;
+
 declare namespace ecs {
 	/**
 	 * Null value of an entity
 	 */
-	export declare const NULL: number;
+	export const NULL: number;
 	/**
 		 *
 		 * @param {number} x
 		 * @returns {number} Version number
 		 */
-	export declare function toVersion(x: number): number;
+	export function toVersion(x: number): number;
 
 	/**
 	 * 
 	 * @param {number} x 
 	 * @returns {number} Id number
 	 */
-	export declare function toId(x: number): number;
+	export function toId(x: number): number;
 
 	/**
 	 * Combines the id of the with the version of the second
@@ -26,16 +27,16 @@ declare namespace ecs {
 	 * @param {number} rhs Version portion is given
 	 * @returns {number} lhs.id | rhs.version;
 	 */
-	export declare function combine(lhs: number, rhs: number): number;
+	export function combine(lhs: number, rhs: number): number;
 
 	/**
 	 * creates a new id using the id of the first and attaching the version provided
 	 * @param {number} lhs
 	 * @param {number} ver
 	 */
-	export declare function construct(lhs: number, version: number): number;
+	export function construct(lhs: number, version: number): number;
 
-	export declare class SparseId {
+	export class SparseId {
 		constructor(x: number);
 
 		page(): number;
@@ -46,13 +47,13 @@ declare namespace ecs {
 		version: number;
 	}
 
-	export declare class SparseSetIterator implements Iterator<number, number>, Iterable<number> {
+	export class SparseSetIterator implements Iterator<number, number>, Iterable<number> {
 		constructor(dense: Array<number>);
 		[Symbol.iterator](): Iterator<number>;
 		next(reset?: boolean): IteratorResult<number, number>;
 	}
 
-	export declare class SparseSet<IteratorType = SparseSetIterator> {
+	export class SparseSet<IteratorType = SparseSetIterator> {
 		/**
 		 * @returns {SparseSetIterator} Iterator for the set
 		 */
@@ -101,18 +102,18 @@ declare namespace ecs {
 		protected _get(id: number): number;
 	}
 
-	export declare interface SparseMapIteratorResult<T> {
+	export interface SparseMapIteratorResult<T> {
 		id: number;
 		value: T;
 	}
 
-	export declare class SparseMapIterator<T> implements Iterable<SparseMapIteratorResult<T>>, Iterator<SparseMapIteratorResult<T>, number, bool> {
+	export class SparseMapIterator<T> implements Iterable<SparseMapIteratorResult<T>>, Iterator<SparseMapIteratorResult<T>, number, bool> {
 		constructor(dense: Array<number>);
 		[Symbol.iterator](): Iterator<SparseMapIteratorResult<T>>;
 		next(reset?: boolean): IteratorResult<SparseMapIteratorResult<T>, number>;
 	}
 
-	export declare class SparseMap<T> extends SparseSet<SparseMapIterator<T>> {
+	export class SparseMap<T> extends SparseSet<SparseMapIterator<T>> {
 		constructor(ctor?: new () => T);
 		/**
 		 *
@@ -140,14 +141,14 @@ declare namespace ecs {
 	}
 
 
-	export declare class ViewIterator<Components extends any[]> implements Iterable<[number, ...Components], number>, Iterable<[number, ...Components]> {
+	export class ViewIterator<Components extends any[]> implements Iterable<[number, ...Components], number>, Iterable<[number, ...Components]> {
 		constructor(components: SparseMap<any>[], leadWith: string);
 
 		[Symbol.iterator](): Iterator<[number, ...Components]>;
 		next(reset?: boolean): IteratorResult<[number, ...Components], number>;
 	}
 
-	export declare class View<Components extends any[]> {
+	export class View<Components extends any[]> {
 		constructor(reg: Registry, components: [...SparseMap<Components>[]], leadWith: string);
 
 		each(): ViewIterator<[...Components]>;
@@ -166,13 +167,13 @@ declare namespace ecs {
 		get _leadWith(): string;
 	}
 
-	export declare interface IExclusion { exclude: true, name: string };
+	export interface IExclusion { exclude: true, name: string };
 
-	export declare function exclude(name: string): IExclusion;
+	export function exclude(name: string): IExclusion;
 	
 	type ViewComponent = string | IExclusion;
 
-	export declare class Registry {
+	export class Registry {
 		all_of(entity, ...components): boolean;
 		any_of(entity, ...components): boolean;
 

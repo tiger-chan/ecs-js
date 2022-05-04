@@ -15,7 +15,8 @@
 	"author": "Anthony Young",
 	"license": "MIT",
 	"devDependencies": {
-		"eslint": "^8.9.0"
+		"eslint": "^8.9.0",
+		"typedoc": "^0.22.15"
 	},
 	"bugs": {
 		"url": "https://github.com/tiger-chan/ecjs/issues"
