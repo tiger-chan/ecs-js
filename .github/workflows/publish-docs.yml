@@ -1,0 +1,30 @@
+name: Publish API Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      
+      - run: npm ci
+      - name: Run Docs Generation
+        run: npm run docs
+      
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: docs/api/
+          add_options: '-A'
+          commit_message: Update API docs
+          branch: documentation
+          create_branch: true

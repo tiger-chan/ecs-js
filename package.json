@@ -9,7 +9,8 @@
 		"url": "https://github.com/tiger-chan/ecjs.git"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"docs": "npx typedoc"
 	},
 	"type": "module",
 	"author": "Anthony Young",
