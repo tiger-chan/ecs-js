@@ -17,9 +17,9 @@ jobs:
         with:
           node-version: 16
       
-      - name: Run Docs Generation
       - run: npm ci
-      - run: npm test
+      - name: Run Docs Generation
+        run: npm docs
       
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
