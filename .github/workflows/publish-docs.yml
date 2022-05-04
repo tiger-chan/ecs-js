@@ -22,7 +22,7 @@ jobs:
       - run: npm test
       
       - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        file_pattern: docs/api/
-        add_options: '-u'
-        commit_message: Update API docs
+        with:
+          file_pattern: docs/api/
+          add_options: '-u'
+          commit_message: Update API docs
