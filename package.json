@@ -9,8 +9,9 @@
 		"url": "https://github.com/tiger-chan/ecjs.git"
 	},
 	"scripts": {
+		"docs": "npx typedoc",
 		"test": "ava",
-		"docs": "npx typedoc"
+		"test-junit": "npx ava --tap | npx tap-junit --output output/"
 	},
 	"type": "module",
 	"author": "Anthony Young",
@@ -18,6 +19,7 @@
 	"devDependencies": {
 		"ava": "^4.1.0",
 		"eslint": "^8.10.0",
+		"tap-junit": "^5.0.2",
 		"typedoc": "^0.22.15"
 	},
 	"bugs": {

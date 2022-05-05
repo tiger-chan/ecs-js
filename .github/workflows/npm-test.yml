@@ -1,0 +1,22 @@
+name: Node.js Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2     # checkout the repo
+      - run: npm ci                   # install packages
+      - run: npm run test-junit       # run tests (configured to use junit reporter)
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: JEST Tests            # Name of the check run which will be created
+          path: output/*.xml          # Path to test results
+          reporter: jest-junit        # Format of test results
