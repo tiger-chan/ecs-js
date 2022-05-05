@@ -1,4 +1,4 @@
-import { Vector } from "./stl";
+import { Vector } from "./stl.js";
 
 /**
  * @constructor
