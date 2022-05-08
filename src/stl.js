@@ -2,65 +2,67 @@
 /// <reference path="../types/stl.d.ts" />
 
 /**
- * @param {number} size Array Length
+ * @template T
+ * @implements {std.Vector<T>}
  */
-export function Vector(size = 0) {
-	/** @type {std.Vector<any>} */
-	let a = new Array(size);
+export class Vector extends Array {
+	constructor(arrayLength = 1) {
+		super(arrayLength)
 
-	a.__size = 0;
-	let back = function () {
+		this.fill(null);
+		this.__capacity = arrayLength;
+	}
+
+	back() {
 		if (0 < this.__size) {
 			return this[this.__size - 1];
 		}
 		return null;
 	}
 
-	let capacity = function () {
-		return this.length;
-	};
-
-	let newSize = function () {
-		return this.__size;
-	};
-
-	/** @this {std.Vector<any>} */
-	const resize = function (newSize, defaultValue) {
-		// @ts-ignore
-		while (newSize > this.length)
-			// @ts-ignore
-			this.push(defaultValue);
-		this.length = newSize;
-		return this.length;
-	};
-
-	let oldPush = Array.prototype.push;
-	/** @this {std.Vector<any>} */
-	let newPush = function (x) {
-		this.__size++;
-		return oldPush.call(this, x);
-	};
-
-	/** @this {std.Vector<any>} */
-	let newPop = function () {
-		if (0 < this.__size) {
-			--this.__size;
-			let val = this[this.__size];
-			delete this[this.__size];
-			this.length = this.__size;
-			return val;
+	resize(newSize) {
+		if (newSize > this.__capacity) {
+			// Allocate more space
+			this.__capacity = newSize;
+			while (this.length < newSize) {
+				super.push(null);
+			}
 		}
-		return undefined;
-	};
 
-	a.capacity = capacity.bind(a);
-	a.size = newSize.bind(a);
-	a.push = newPush.bind(a);
-	a.pop = newPop.bind(a);
-	a.resize = resize.bind(a);
-	a.back = back.bind(a);
-	a.length = size;
-	return a;
+		return this.__size = newSize;
+	}
+
+	capacity() {
+		return this.__capacity;
+	}
+
+	size() {
+		return this.__size;
+	}
+
+	push(x) {
+		if (this.__size < this.__capacity) {
+			return this[this.__size++] = x, this.__size;
+		}
+
+		this.__capacity = Math.max(this.__capacity, 1) * 2;
+		while (this.length < this.__capacity) {
+			super.push(null);
+		}
+
+		return this[this.__size++] = x, this.__size;
+	}
+
+	pop() {
+		if (0 < this.__size) {
+			let a = this[--this.__size];
+			return this[this.__size] = null, a;
+		}
+		return null;
+	}
+
+	__size = 0;
+	__capacity = 0;
 }
 
 /**
@@ -116,3 +118,11 @@ export function cto(x) {
 export function clo(x) {
 	return clz(~x);
 }
+
+export default {
+	ctz
+	, clz
+	, cto
+	, clo
+	, Vector
+};
