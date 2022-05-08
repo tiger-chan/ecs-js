@@ -7,7 +7,7 @@
  */
 export class Vector extends Array {
 	constructor(arrayLength = 1) {
-		super(arrayLength)
+		super(arrayLength);
 
 		this.fill(null);
 		this.__capacity = arrayLength;
