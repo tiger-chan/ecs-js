@@ -24,7 +24,7 @@ test("destroy()", (t) => {
 
 test("emplace(comp)", (t) => {
 	class Foo {
-	};
+	}
 
 	{
 		const reg = new jsdyn.Registry();
@@ -42,7 +42,7 @@ test("emplace(comp)", (t) => {
 
 test("get(comp)", (t) => {
 	class Foo {
-	};
+	}
 
 	{
 		const reg = new jsdyn.Registry();
@@ -60,7 +60,7 @@ test("get(comp)", (t) => {
 
 test("remove(comp)", (t) => {
 	class Foo {
-	};
+	}
 
 	{
 		const reg = new jsdyn.Registry();
