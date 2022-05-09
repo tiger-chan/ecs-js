@@ -136,21 +136,24 @@ export class Registry {
 			let compName = component;
 			let poolAdd = (name, pool) => {
 				comps.set(name, pool);
-			}
+			};
+
 			let getMin = (comp, size) => {
 				if (smallestSize > size) {
 					return [comp, size];
 				}
 				return [smallest, smallestSize];
-			}
-			if (typeof(component) == "object") {
+			};
+
+			if (typeof (component) == "object") {
 				compName = compName.name;
 				poolAdd = (name, pool) => {
 					excludes.set(name, pool);
-				}
+				};
+
 				getMin = () => {
 					return [smallest, smallestSize];
-				}
+				};
 			}
 
 			if (!this.#pools.has(compName)) {
