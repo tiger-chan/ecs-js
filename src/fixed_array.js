@@ -1,12 +1,10 @@
-import { Vector } from "./stl.js";
-
 /**
  * @template T
  * @implements {std.FixedArray<T>}
  */
 export class FixedArray extends Array {
 	constructor(arrayLength = 1) {
-		super(arrayLength)
+		super(arrayLength);
 
 		this.fill();
 		this.__capacity = arrayLength;
