@@ -13,12 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2     # checkout the repo
       - run: npm ci                   # install packages
-      - run: npm run test-junit       # run tests (configured to use junit reporter)
+      # run tests (configured to use junit reporter)
+      - run: for f in $(find test -name '*.test.js') ; do npx ava --tap $f | npx tap-junit -o output/$(dirname ${f#test/})  -n $(basename ${f%.*}).xml ; done
 
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()    # run this step even if previous step failed
         with:
           name: JEST Tests            # Name of the check run which will be created
-          path: output/*.xml          # Path to test results
+          path: output/**/*.xml          # Path to test results
           reporter: jest-junit        # Format of test results
