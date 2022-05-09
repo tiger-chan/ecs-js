@@ -1,4 +1,4 @@
-import { PAGE_SIZE, NULL, RESERVED } from "./constants.js";
+import { PAGE_SIZE, NULL } from "./constants.js";
 import { FixedArray } from "./fixed_array.js";
 import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
 import { assert } from "./assert.js";
