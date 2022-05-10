@@ -9,14 +9,17 @@
 		"url": "https://github.com/tiger-chan/ecjs.git"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"docs": "npx typedoc"
+		"docs": "npx typedoc",
+		"test": "ava",
+		"test-junit": "npx ava --tap | npx tap-junit --output output/"
 	},
 	"type": "module",
 	"author": "Anthony Young",
 	"license": "MIT",
 	"devDependencies": {
-		"eslint": "^8.9.0",
+		"ava": "^4.1.0",
+		"eslint": "^8.10.0",
+		"tap-junit": "^5.0.2",
 		"typedoc": "^0.22.15"
 	},
 	"bugs": {

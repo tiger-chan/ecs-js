@@ -1,4 +1,4 @@
-import { PAGE_SIZE, NULL, RESERVED } from "./constants.js";
+import { PAGE_SIZE, NULL } from "./constants.js";
 import { FixedArray } from "./fixed_array.js";
 import { SparseId, toVersion, toId, combine } from "./sparse_id.js";
 import { assert } from "./assert.js";
@@ -79,7 +79,7 @@ export class SparseSet {
 		if (this.#freeList == NULL) {
 			this.#dense.push(combine(elem.toNumber(), id));
 			mixin.push();
-			this.#sparse[elem.page()][elem.pos()] = combine(this.#dense.length - 1, id);
+			this.#sparse[elem.page()][elem.pos()] = combine(this.#dense.size() - 1, id);
 			elem = id;
 		}
 		else {
@@ -130,7 +130,7 @@ export class SparseSet {
 	}
 
 	size() {
-		return this.#dense.length;
+		return this.#dense.size();
 	}
 
 	/**
@@ -170,13 +170,12 @@ export class SparseSet {
 		const page = id.page();
 		const pos = id.pos();
 
-		if (!(page < this.#sparse.length)) {
+		if (!(page < this.#sparse.size())) {
 			// resize the array such that has as many pages as needed.
 			this.#sparse.resize(page + 1, null);
 		}
 
 		if (!this.#sparse[page]) {
-			// @ts-ignore
 			this.#sparse[page] = new FixedArray(PAGE_SIZE);
 			this.#sparse[page].fill(NULL, 0, PAGE_SIZE);
 		}
@@ -235,10 +234,8 @@ export class SparseSet {
 	};
 
 	/** @type {std.Vector<number>} */
-	// @ts-ignore
 	#dense = new Vector();
 	/** @type {std.Vector<std.FixedArray<number>>} */
-	// @ts-ignore
 	#sparse = new Vector();
 	/** @type {number} */
 	#freeList = NULL;
