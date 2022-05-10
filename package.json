@@ -1,12 +1,12 @@
 {
-	"name": "@tiger-chan/ecjs",
+	"name": "@tiger-chan/ecs-js",
 	"version": "0.5.0",
 	"description": "Simple ECS implementation for JavaScript",
 	"main": "./src/index.js",
 	"types": "./types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tiger-chan/ecjs.git"
+		"url": "https://github.com/tiger-chan/ecs-js.git"
 	},
 	"scripts": {
 		"docs": "npx typedoc",
@@ -23,9 +23,9 @@
 		"typedoc": "^0.22.15"
 	},
 	"bugs": {
-		"url": "https://github.com/tiger-chan/ecjs/issues"
+		"url": "https://github.com/tiger-chan/ecs-js/issues"
 	},
-	"homepage": "https://github.com/tiger-chan/ecjs#readme",
+	"homepage": "https://github.com/tiger-chan/ecs-js#readme",
 	"directories": {
 		"doc": "docs"
 	},
